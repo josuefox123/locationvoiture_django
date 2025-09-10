@@ -1,0 +1,24 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django stuff:
+*.log
+db.sqlite3
+media/
+staticfiles/
+.env
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Migrations cache (optionnel, si tu veux garder migrations enlève cette ligne)
+*/migrations/*.pyc
+*/migrations/__pycache__/
