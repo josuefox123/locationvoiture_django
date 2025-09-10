@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des Véhicules - Système de Location</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .hero-section {
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1537005081207-04f90e3ba640?ixlib=rb-4.0.3&auto=format&fit=crop&w=1674&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 30px;
+        }
+        .vehicle-card {
+            transition: transform 0.3s;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            height: 100%;
+        }
+        .vehicle-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
+        .vehicle-image {
+            height: 200px;
+            object-fit: cover;
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .action-buttons .btn {
+            margin-right: 5px;
+        }
+        .add-button {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Barre de navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fa fa-car me-2"></i>AutoLocation
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Accueil</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/vehicules/">Véhicules</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/clients/">Clients</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/locations/">Locations</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Section Hero -->
+    <section class="hero-section text-center">
+        <div class="container">
+            <h1 class="display-5 fw-bold mb-4">Gestion des Véhicules</h1>
+            <p class="lead mb-4">Consultez et gérez tous les véhicules de votre flotte automobile</p>
+        </div>
+    </section>
+
+    <!-- Contenu principal -->
+    <div class="container mb-5">
+        <div class="d-flex justify-content-between align-items-center add-button">
+            <h2>Liste des véhicules</h2>
+            <a href="{% url 'ajouter_vehicule' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Ajouter un véhicule
+            </a>
+        </div>
+
+        {% if vehicules %}
+        <div class="row">
+            {% for v in vehicules %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card vehicle-card">
+                    {% if v.photo %}
+                    <img src="{{ v.photo.url }}" class="card-img-top vehicle-image" alt="{{ v.marque }} {{ v.model }}">
+                    {% else %}
+                    <img src="https://images.unsplash.com/photo-1549399542-7e821f5e3c8f?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80" class="card-img-top vehicle-image" alt="Véhicule sans image">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ v.marque }} {{ v.model }}</h5>
+                        <p class="card-text">
+                            <strong>Immatriculation:</strong> {{ v.immatriculation }}<br>
+                            <strong>Kilométrage:</strong> {{ v.kilometrageinitiale }} km
+                        </p>
+                    </div>
+                    <div class="card-footer bg-white action-buttons">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'modifier_vehicule' v.id_vehicule %}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-edit me-1"></i>Modifier
+                            </a>
+                            <a href="{% url 'supprimer_vehicule' v.id_vehicule %}" class="btn btn-outline-danger btn-sm">
+                                <i class="fas fa-trash me-1"></i>Supprimer
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            <i class="fas fa-info-circle me-2"></i>Aucun véhicule n'a été ajouté pour le moment.
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Pied de page -->
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container">
+            <p class="mb-0">&copy; 2023 AutoLocation - Tous droits réservés</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap & JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

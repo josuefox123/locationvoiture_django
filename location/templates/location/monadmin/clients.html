@@ -1,0 +1,171 @@
+{% extends "location/monadmin/base.html" %}
+
+{% block title %}Gestion des Clients - Admin AutoLocation{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center pb-3 mb-4 border-bottom">
+    <h1 class="h3 fw-bold text-primary">
+        <i class="fas fa-users me-2"></i>Gestion des Clients
+    </h1>
+</div>
+
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-light d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-semibold">
+            <i class="fas fa-list me-2 text-primary"></i>Liste des clients
+        </h5>
+        <span class="badge bg-primary rounded-pill">{{ clients|length }} enregistrement{{ clients|length|pluralize }}</span>
+    </div>
+
+    <div class="card-body">
+
+        <!-- Barre recherche -->
+        <div class="row mb-3">
+            <div class="col-md-4 ms-auto">
+                <input type="text" id="searchInput" class="form-control form-control-sm shadow-sm" placeholder="🔎 Rechercher un client...">
+            </div>
+        </div>
+
+        <!-- Tableau -->
+        <div class="table-responsive">
+            <table class="table align-middle table-hover" id="clientTable">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Photo</th>
+                        <th scope="col">Nom & Prénom</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Téléphone</th>
+                        <th scope="col" class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for client in clients %}
+                    <tr>
+                        <td>
+                            {% if client.photo %}
+                                <img src="{{ client.photo.url }}" alt="{{ client.nom }}" 
+                                     class="rounded border" style="width: 55px; height: 55px; object-fit: cover;">
+                            {% else %}
+                                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 55px; height: 55px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td class="fw-semibold">{{ client.nom }} {{ client.prenom }}</td>
+                        <td>{{ client.email }}</td>
+                        <td><span class="badge bg-dark">{{ client.telephone }}</span></td>
+                        <td class="text-center">
+                            <a href="{% url 'modifier_client' client.id_client %}" 
+                               class="btn btn-sm btn-outline-primary me-1" title="Modifier">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <!-- Bouton ouvre la modale -->
+                            <button type="button" 
+                                    class="btn btn-sm btn-outline-danger" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#deleteModal{{ client.id_client }}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+
+                    <!-- Modal suppression -->
+                    <div class="modal fade" id="deleteModal{{ client.id_client }}" tabindex="-1" aria-hidden="true">
+                      <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content shadow-lg border-0">
+                          <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title">
+                                <i class="fas fa-exclamation-triangle me-2"></i> Confirmation
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                          </div>
+                          <div class="modal-body">
+                            <p class="mb-0">
+                                Voulez-vous vraiment supprimer le client 
+                                <strong>{{ client.nom }} {{ client.prenom }}</strong> ?
+                            </p>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Annuler</button>
+                            <a href="{% url 'supprimer_client' client.id_client %}" class="btn btn-danger btn-sm">
+                              <i class="fas fa-trash-alt me-1"></i> Supprimer
+                            </a>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-4">
+                            <div class="text-muted">
+                                <i class="fas fa-info-circle me-2"></i>Aucun client enregistré.
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        <nav class="d-flex justify-content-center mt-3">
+            <ul class="pagination pagination-sm" id="pagination"></ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Script pagination et recherche -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const rowsPerPage = 5; 
+    const table = document.getElementById("clientTable");
+    const rows = table.querySelectorAll("tbody tr");
+    const pagination = document.getElementById("pagination");
+    const searchInput = document.getElementById("searchInput");
+
+    let currentPage = 1;
+
+    function displayRows() {
+        let start = (currentPage - 1) * rowsPerPage;
+        let end = start + rowsPerPage;
+
+        rows.forEach((row, index) => {
+            row.style.display = (index >= start && index < end) ? "" : "none";
+        });
+    }
+
+    function setupPagination() {
+        pagination.innerHTML = "";
+        let pageCount = Math.ceil(rows.length / rowsPerPage);
+
+        for (let i = 1; i <= pageCount; i++) {
+            let li = document.createElement("li");
+            li.className = "page-item" + (i === currentPage ? " active" : "");
+            li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+            li.addEventListener("click", function (e) {
+                e.preventDefault();
+                currentPage = i;
+                displayRows();
+                setupPagination();
+            });
+            pagination.appendChild(li);
+        }
+    }
+
+    // Recherche filtrage
+    searchInput.addEventListener("keyup", function () {
+        let filter = searchInput.value.toLowerCase();
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(filter) ? "" : "none";
+        });
+    });
+
+    // Init
+    displayRows();
+    setupPagination();
+});
+</script>
+{% endblock %}

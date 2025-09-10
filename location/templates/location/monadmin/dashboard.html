@@ -1,0 +1,151 @@
+{% extends "location/monadmin/base.html" %}
+
+{% block title %}Dashboard - Admin AutoLocation{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+    <h1 class="h2">Tableau de bord</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <span class="me-2">Connecté en tant que: <strong>{{ user.username }}</strong></span>
+    </div>
+</div>
+
+<!-- Statistiques -->
+<div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2 stat-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Véhicules</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_vehicules }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-car fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-success shadow h-100 py-2 stat-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Clients</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_clients }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-users fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-info shadow h-100 py-2 stat-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Locations Total</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.total_locations }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-key fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+        <div class="card border-left-warning shadow h-100 py-2 stat-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Locations Actives</div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800">{{ stats.locations_actives }}</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-calendar-check fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Locations récentes -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Locations Récentes</h6>
+            </div>
+            <div class="card-body">
+                {% if locations_recentes %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Véhicule</th>
+                                <th>Client</th>
+                                <th>Date Début</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for location in locations_recentes %}
+                            <tr>
+                                <td>{{ location.id_vehicule.marque }} {{ location.id_vehicule.model }}</td>
+                                <td>{{ location.id_client.prenom }} {{ location.id_client.nom }}</td>
+                                <td>{{ location.date_debut|date:"d/m/Y" }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">Aucune location récente.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Véhicules populaires -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Véhicules les Plus Populaires</h6>
+            </div>
+            <div class="card-body">
+                {% if vehicules_populaires %}
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Véhicule</th>
+                                <th>Immatriculation</th>
+                                <th>Nombre de Locations</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for vehicule in vehicules_populaires %}
+                            <tr>
+                                <td>{{ vehicule.marque }} {{ vehicule.model }}</td>
+                                <td>{{ vehicule.immatriculation }}</td>
+                                <td><span class="badge bg-primary">{{ vehicule.nb_locations }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">Aucune donnée disponible.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

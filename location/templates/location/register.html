@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - AutoLocation</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .register-container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="register-container">
+            <div class="logo">
+                <h2><i class="fa fa-car me-2 text-primary"></i>AutoLocation</h2>
+                <p class="text-muted">Créez votre compte client</p>
+            </div>
+
+            <!-- Messages Django -->
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %} me-2"></i>
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            <!-- Formulaire -->
+            <form method="POST" novalidate>
+                {% csrf_token %}
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="firstName" class="form-label">Prénom</label>
+                        <input type="text" class="form-control" id="firstName" name="prenom" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="lastName" class="form-label">Nom</label>
+                        <input type="text" class="form-control" id="lastName" name="nom" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="email" class="form-label">Adresse Email</label>
+                    <input type="email" class="form-control" id="email" name="email" placeholder="exemple@email.com" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="telephone" class="form-label">Téléphone</label>
+                    <input type="tel" class="form-control" id="telephone" name="telephone" placeholder="+229 60 00 00 00" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="profession" class="form-label">Profession</label>
+                    <input type="text" class="form-control" id="profession" name="profession">
+                </div>
+
+                <div class="mb-3">
+                    <label for="address" class="form-label">Adresse</label>
+                    <textarea class="form-control" id="address" name="address" rows="2"></textarea>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="password1" class="form-label">Mot de passe</label>
+                        <input type="password" class="form-control" id="password1" name="password1" required minlength="6">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="password2" class="form-label">Confirmer le mot de passe</label>
+                        <input type="password" class="form-control" id="password2" name="password2" required minlength="6">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 btn-lg">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Créer mon compte
+                </button>
+            </form>
+
+            <div class="text-center mt-3">
+                <p>Déjà inscrit ? <a href="{% url 'login' %}">Se connecter</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap & JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validation mot de passe côté client
+        document.querySelector("form").addEventListener("submit", function (e) {
+            const pass1 = document.getElementById("password1").value;
+            const pass2 = document.getElementById("password2").value;
+
+            if (pass1 !== pass2) {
+                e.preventDefault();
+                alert("Les mots de passe ne correspondent pas !");
+                document.getElementById("password2").focus();
+            }
+        });
+    </script>
+</body>
+
+</html>

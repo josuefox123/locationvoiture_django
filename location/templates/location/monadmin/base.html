@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="fr" data-bs-theme="auto">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Admin AutoLocation{% endblock %}</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --success-color: #198754;
+            --dark-color: #212529;
+            --light-color: #f8f9fa;
+            --sidebar-width: 280px;
+            --header-height: 70px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f5f7fb;
+            color: #333;
+        }
+
+        .sidebar {
+            position: fixed;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(180deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        .sidebar-brand {
+            padding: 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-brand h4 {
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.85);
+            padding: 0.85rem 1.5rem;
+            margin: 0.15rem 0.5rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar .nav-link:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .sidebar .nav-link.active {
+            color: white;
+            background: var(--primary-color);
+            box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+        }
+
+        .sidebar .nav-link i {
+            width: 20px;
+            margin-right: 12px;
+            font-size: 1.1rem;
+        }
+
+        .nav-badge {
+            position: absolute;
+            right: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .navbar-top {
+            background: white;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            height: var(--header-height);
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #0d6efd, #0a58ca);
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #0a58ca, #084298);
+            transform: translateY(-2px);
+        }
+
+        /* Dark mode support */
+        [data-bs-theme="dark"] {
+            --bg-color: #1a1d21;
+            --card-bg: #2d3035;
+            --text-color: #e9ecef;
+        }
+
+        [data-bs-theme="dark"] .stat-card {
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.show {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar-brand h4 {
+                display: none;
+            }
+            
+            .sidebar .nav-link span {
+                display: none;
+            }
+            
+            .sidebar .nav-link i {
+                margin-right: 0;
+                font-size: 1.2rem;
+            }
+            
+            .nav-badge {
+                display: none;
+            }
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* Notification dot */
+        .notification-dot {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 10px;
+            height: 10px;
+            background-color: #ff4757;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(0.95); opacity: 0.7; }
+        }
+        
+        /* Enhanced dropdown */
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            border-radius: 0.75rem;
+            padding: 0.5rem;
+        }
+        
+        .dropdown-item {
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            transition: all 0.2s;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* Status indicators */
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .status-online { background-color: #0acf83; }
+        .status-offline { background-color: #fa5a7d; }
+        .status-away { background-color: #ff947a; }
+        
+        /* Enhanced table styling */
+        .table-enhanced th {
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+            border-top: none;
+            background-color: #f8fafc;
+        }
+        
+        .table-enhanced tbody tr {
+            transition: all 0.2s;
+        }
+        
+        .table-enhanced tbody tr:hover {
+            background-color: #f8fafc;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <h4 class="text-center">
+                <i class="fa fa-car me-2"></i>AutoLocation
+            </h4>
+        </div>
+        
+        <div class="pt-3">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'monadmin' %}active{% endif %}" 
+                       href="{% url 'monadmin' %}">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                        <span class="nav-badge">{% block dashboard_count %}{% endblock %}</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'monadmin_vehicules' %}active{% endif %}" 
+                       href="{% url 'monadmin_vehicules' %}">
+                        <i class="fas fa-car"></i>
+                        <span>Véhicules</span>
+                        <span class="nav-badge">{% block vehicules_count %}{% endblock %}</span>
+                    <div id="spa-content">
+    {% block content %}{% endblock %}
+</div>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'monadmin_clients' %}active{% endif %}" 
+                       href="{% url 'monadmin_clients' %}">
+                        <i class="fas fa-users"></i>
+                        <span>Clients</span>
+                        <span class="nav-badge">{% block clients_count %}{% endblock %}</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'monadmin_locations' %}active{% endif %}" 
+                       href="{% url 'monadmin_locations' %}">
+                        <i class="fas fa-key"></i>
+                        <span>Locations</span>
+                        <span class="nav-badge">{% block locations_count %}{% endblock %}</span>
+                        <span class="notification-dot"></span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accueil' %}">
+                        <i class="fas fa-globe"></i>
+                        <span>Site Public</span>
+                    </a>
+                </li>
+                <li class="nav-item mt-4">
+                    <form method="POST" action="{% url 'logout' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="nav-link btn btn-link text-start w-100">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Déconnexion</span>
+                        </button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Dark mode toggle -->
+        <div class="position-absolute bottom-0 start-0 end-0 p-3">
+            <div class="form-check form-switch">
+                <input class="form-check-input" type="checkbox" id="darkModeToggle">
+                <label class="form-check-label text-white" for="darkModeToggle">
+                    <i class="fas fa-moon"></i> Mode sombre
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <!-- Top Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm py-2 sticky-top">
+            <div class="container-fluid">
+                <!-- Sidebar toggle for mobile -->
+                <button class="btn btn-outline-primary d-md-none me-2" type="button" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <!-- Breadcrumb -->
+                <nav aria-label="breadcrumb" class="d-none d-md-block">
+                    <ol class="breadcrumb mb-0">
+                        <li class="breadcrumb-item"><a href="{% url 'monadmin' %}">Admin</a></li>
+                        {% block breadcrumb %}{% endblock %}
+                    </ol>
+                </nav>
+
+                <!-- Right part -->
+                <div class="d-flex align-items-center ms-auto">
+                    <!-- Notifications -->
+                    <div class="dropdown me-3">
+                        <button class="btn btn-light position-relative border-0 rounded-circle" 
+                                type="button" id="notificationDropdown" data-bs-toggle="dropdown">
+                            <i class="fas fa-bell fa-lg text-secondary"></i>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                3
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="notificationDropdown">
+                            <li class="dropdown-header">Notifications</li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="me-3">
+                                        <i class="fas fa-car text-primary bg-light p-2 rounded-circle"></i>
+                                    </div>
+                                    <div>
+                                        <div class="small text-muted">Il y a 5 min</div>
+                                        <span>Nouvelle demande de location</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="me-3">
+                                        <i class="fas fa-user text-success bg-light p-2 rounded-circle"></i>
+                                    </div>
+                                    <div>
+                                        <div class="small text-muted">Il y a 1 heure</div>
+                                        <span>Nouveau client inscrit</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item d-flex align-items-center" href="#">
+                                    <div class="me-3">
+                                        <i class="fas fa-exclamation-triangle text-warning bg-light p-2 rounded-circle"></i>
+                                    </div>
+                                    <div>
+                                        <div class="small text-muted">Hier</div>
+                                        <span>Véhicule #12 nécessite maintenance</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-center text-primary" href="#">Voir toutes les notifications</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Online status -->
+                    <div class="me-3 d-flex align-items-center d-none d-md-flex">
+                        <span class="badge rounded-pill bg-success px-3 py-2 shadow-sm">
+                            <span class="status-indicator status-online"></span> En ligne
+                        </span>
+                    </div>
+
+                    <!-- User dropdown -->
+                    <div class="dropdown">
+                        <button class="btn btn-light d-flex align-items-center border rounded-pill shadow-sm px-3" 
+                                type="button" id="userDropdown" data-bs-toggle="dropdown">
+                            <div class="position-relative me-2">
+                                <i class="fas fa-user-circle fa-lg text-primary"></i>
+                                <span class="position-absolute bottom-0 end-0 status-indicator status-online"></span>
+                            </div>
+                            <span class="fw-semibold">
+                                {{ request.user.get_full_name|default:request.user.username }}
+                            </span>
+                            <i class="fas fa-chevron-down ms-2 text-muted small"></i>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm animate__animated animate__fadeIn">
+                            <li class="dropdown-header">
+                                Connecté en tant que <strong>{{ request.user.username }}</strong>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-user me-2 text-primary"></i>Profil
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-cog me-2 text-secondary"></i>Paramètres
+                                </a>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="POST" action="{% url 'logout' %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="dropdown-item text-danger">
+                                        <i class="fas fa-sign-out-alt me-2"></i>Déconnexion
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="container-fluid px-4 py-4">
+            {% if messages %}
+            <div class="row">
+                <div class="col-12">
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show shadow-sm mb-3" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="fas 
+                                {% if message.tags == 'success' %}fa-check-circle text-success{% endif %}
+                                {% if message.tags == 'error' %}fa-exclamation-circle text-danger{% endif %}
+                                {% if message.tags == 'warning' %}fa-exclamation-triangle text-warning{% endif %}
+                                {% if message.tags == 'info' %}fa-info-circle text-info{% endif %}
+                                me-2"></i>
+                            <span>{{ message }}</span>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+
+    <!-- Bootstrap Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Dark mode toggle
+        document.getElementById('darkModeToggle').addEventListener('change', function() {
+            if (this.checked) {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', 'light');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+            document.getElementById('darkModeToggle').checked = savedTheme === 'dark';
+        }
+
+        // Mobile sidebar toggle
+        document.getElementById('sidebarToggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('show');
+        });
+
+        // Auto-hide alerts after 5 seconds
+        document.addEventListener('DOMContentLoaded', function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                setTimeout(() => {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                }, 5000);
+            });
+        });
+
+        // Update notification counts (example)
+        function updateNotificationCounts() {
+            // This would typically fetch data from your backend
+            // For demonstration, we're using static values
+            const notifications = [
+                { type: 'location', count: 3 },
+                { type: 'client', count: 2 },
+                { type: 'vehicle', count: 1 }
+            ];
+            
+            // Update the notification badge
+            const totalNotifications = notifications.reduce((total, notif) => total + notif.count, 0);
+            document.querySelector('.notification-dot').style.display = totalNotifications > 0 ? 'block' : 'none';
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateNotificationCounts();
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

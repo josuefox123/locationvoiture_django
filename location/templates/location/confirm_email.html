@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation de compte - AutoLocation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'accueil' %}">
+                <i class="fa fa-car me-2"></i>AutoLocation
+            </a>
+        </div>
+    </nav>
+
+    <!-- Contenu principal -->
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                
+                <div class="card shadow">
+                    <div class="card-header bg-primary text-white text-center">
+                        <h4 class="mb-0">
+                            <i class="fas fa-envelope-circle-check me-2"></i>
+                            Confirmation de compte
+                        </h4>
+                    </div>
+                    <div class="card-body">
+
+                        <!-- Messages Django -->
+                        {% if messages %}
+                        <div class="mb-3">
+                            {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %} me-2"></i>
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <!-- Texte d’intro -->
+                        <p class="mb-4">
+                            Bonjour <strong class="text-primary">{{ user.first_name }}</strong>,<br>
+                            Veuillez entrer le code de confirmation envoyé à :
+                            <span class="text-primary fw-bold">{{ user.email }}</span>.
+                        </p>
+                        
+                        <!-- Formulaire de confirmation -->
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            <div class="mb-3">
+                                <label for="code" class="form-label">
+                                    <i class="fas fa-key me-1"></i> Code de confirmation
+                                </label>
+                                <input type="text" name="code" id="code"
+                                       class="form-control form-control-lg"
+                                       placeholder="Entrez votre code à 6 chiffres"
+                                       required pattern="[0-9]{6}"
+                                       title="Veuillez entrer un code à 6 chiffres">
+                                <div class="form-text">Le code est composé de 6 chiffres</div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-success w-100 btn-lg">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Confirmer mon compte
+                            </button>
+                        </form>
+                        
+                        <hr>
+                        
+                        <!-- Renvoyer le code -->
+                        <p class="text-center mb-3">
+                            <i class="fas fa-question-circle me-1 text-muted"></i>
+                            Vous n'avez pas reçu de code ?
+                        </p>
+                        <div class="text-center">
+                            <a href="{% url 'resend_code' user.id %}" class="btn btn-outline-primary">
+                                <i class="fas fa-paper-plane me-2"></i>
+                                Renvoyer un nouveau code
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Retour accueil -->
+                <div class="text-center mt-3">
+                    <a href="{% url 'accueil' %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Retour à l'accueil
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Focus automatique sur le champ code
+        document.addEventListener('DOMContentLoaded', () => {
+            const input = document.getElementById('code');
+            if (input) input.focus();
+        });
+
+        // Validation front-end du format du code
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const codeInput = document.getElementById('code');
+            const codeValue = codeInput.value.trim();
+            
+            if (!/^\d{6}$/.test(codeValue)) {
+                e.preventDefault();
+                alert('Veuillez entrer un code valide de 6 chiffres.');
+                codeInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>
