@@ -1,5 +1,6 @@
 from django import forms
 from .models import Vehicule, Client, Louer
+from django.contrib.auth.models import User
 
 class VehiculeForm(forms.ModelForm):
     class Meta:
@@ -7,18 +8,30 @@ class VehiculeForm(forms.ModelForm):
         fields = '__all__'
         
 
+
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "email"]  # on limite aux champs utiles
+        widgets = {
+            "first_name": forms.TextInput(attrs={"class": "form-control"}),
+            "last_name": forms.TextInput(attrs={"class": "form-control"}),
+            "email": forms.EmailInput(attrs={"class": "form-control"}),
+        }
+
 class ClientForm(forms.ModelForm):
     class Meta:
         model = Client
-        exclude = ['user']
+        exclude = ["user", "email_confirmed", "confirmation_code", "confirmation_code_expires_at"]
         widgets = {
-            'nom': forms.TextInput(attrs={'class': 'form-control'}),
-            'prenom': forms.TextInput(attrs={'class': 'form-control'}),
-            'profession': forms.TextInput(attrs={'class': 'form-control'}),
-            'adresse': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'telephone': forms.TextInput(attrs={'class': 'form-control'}),
+            "nom": forms.TextInput(attrs={"class": "form-control"}),
+            "prenom": forms.TextInput(attrs={"class": "form-control"}),
+            "profession": forms.TextInput(attrs={"class": "form-control"}),
+            "adresse": forms.Textarea(attrs={"class": "form-control", "rows": 3}),
+            "telephone": forms.TextInput(attrs={"class": "form-control"}),
         }
+
 
 class LouerForm(forms.ModelForm):
     class Meta:

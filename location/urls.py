@@ -15,6 +15,9 @@ urlpatterns = [
     path("clients/modifier/<int:id>/", views.modifier_client, name="modifier_client"),
     path("clients/supprimer/<int:id>/", views.supprimer_client, name="supprimer_client"),
 
+    path("mon-profil/", views.modifier_mon_profil, name="modifier_mon_profil"),
+
+
     # Louer
     path("locations/", views.liste_locations, name="locations"),
     path("locations/ajouter/", views.ajouter_location, name="ajouter_location"),

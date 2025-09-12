@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modifier mon profil - AutoLocation</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-color: #0d6efd;
+            --secondary-color: #6c757d;
+            --accent-color: #ffc107;
+            --dark-color: #212529;
+            --light-color: #f8f9fa;
+        }
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; color: #333; padding-top: 80px; }
+        .navbar { box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 0.8rem 0; }
+        .navbar-brand { font-weight: 700; font-size: 1.5rem; }
+        .navbar-brand span { color: var(--primary-color); }
+        .profile-container { max-width: 1000px; margin: 0 auto; }
+        .profile-card { border: none; border-radius: 15px; box-shadow: 0 5px 25px rgba(0, 0, 0, 0.08); overflow: hidden; background: #fff; }
+        .profile-header { background: linear-gradient(135deg, var(--primary-color), #0a58ca); color: white; padding: 2rem; text-align: center; }
+        .profile-avatar { width: 120px; height: 120px; border-radius: 50%; border: 4px solid white; object-fit: cover; margin-bottom: 1rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .profile-body { padding: 2rem; }
+        .section-title { position: relative; padding-bottom: 0.8rem; margin-bottom: 1.5rem; font-weight: 600; }
+        .section-title:after { content: ''; position: absolute; bottom: 0; left: 0; width: 50px; height: 3px; background: linear-gradient(45deg, var(--primary-color), var(--accent-color)); border-radius: 3px; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-label { font-weight: 500; margin-bottom: 0.5rem; color: #495057; }
+        .form-control { border-radius: 0.5rem; padding: 0.75rem 1rem; border: 1px solid #dee2e6; }
+        .form-control:focus { border-color: var(--primary-color); box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15); }
+        textarea.form-control { min-height: 100px; resize: vertical; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary-color), #0a58ca); border: none; border-radius: 0.5rem; padding: 0.75rem 1.5rem; font-weight: 500; transition: all 0.3s ease; }
+        .btn-primary:hover { background: linear-gradient(135deg, #0a58ca, #084298); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(13, 110, 253, 0.3); }
+        .btn-warning { background: linear-gradient(135deg, var(--accent-color), #e0a800); border: none; border-radius: 0.5rem; padding: 0.75rem 1.5rem; font-weight: 500; color: #000; }
+        .btn-warning:hover { background: linear-gradient(135deg, #e0a800, #c69500); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3); color: #000; }
+        .alert { border-radius: 0.5rem; border: none; padding: 1rem 1.5rem; }
+        .errorlist { list-style: none; padding: 0; margin: 0.5rem 0 0 0; color: #dc3545; font-size: 0.875rem; }
+        .divider { display: flex; align-items: center; text-align: center; margin: 2rem 0; color: #6c757d; }
+        .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid #dee2e6; }
+        .divider::before { margin-right: 1rem; }
+        .divider::after { margin-left: 1rem; }
+        .password-strength { height: 5px; margin-top: 0.5rem; border-radius: 3px; background: #e9ecef; overflow: hidden; }
+        .password-strength-bar { height: 100%; width: 0; transition: width 0.3s; border-radius: 3px; }
+    </style>
+</head>
+
+<body>
+   <!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="{% url 'accueil' %}">
+            <i class="fa fa-car me-2"></i><span>Auto</span>Location
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'accueil' %}active{% endif %}" href="{% url 'accueil' %}">Accueil</a>
+                </li>
+                <!-- <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'vehicules' %}active{% endif %}" href="{% url 'vehicules' %}">Véhicules</a>
+                </li> -->
+
+                {% if user.is_authenticated %}
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle {% if request.resolver_match.url_name == 'modifier_mon_profil' %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user me-1"></i>{{ user.first_name }}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end shadow">
+                        <li><a class="dropdown-item {% if request.resolver_match.url_name == 'mes_locations' %}active{% endif %}" href="{% url 'mes_locations' %}"><i class="fas fa-key me-2"></i>Mes locations</a></li>
+                        <li><a class="dropdown-item {% if request.resolver_match.url_name == 'modifier_mon_profil' %}active{% endif %}" href="{% url 'modifier_mon_profil' %}"><i class="fas fa-user me-2"></i>Mon profil</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="POST" action="{% url 'logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item"><i class="fas fa-sign-out-alt me-2"></i>Déconnexion</button>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>
+
+    <!-- Profile Section -->
+    <div class="container profile-container my-5">
+        <div class="profile-card">
+            <div class="profile-header">
+                <img src="https://ui-avatars.com/api/?name={{ form.prenom.value|default:user.first_name }}+{{ form.nom.value|default:user.last_name }}&background=0D8ABC&color=fff&size=120" 
+                     alt="Avatar" class="profile-avatar">
+                <h3>{{ form.prenom.value|default:user.first_name }} {{ form.nom.value|default:user.last_name }}</h3>
+                <p class="mb-0">Membre depuis {{ user.date_joined|date:"F Y" }}</p>
+            </div>
+            
+            <div class="profile-body">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <h4 class="section-title">Informations personnelles</h4>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="profile">
+                    {{ form.as_p }}
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Mettre à jour le profil</button>
+                </form>
+                
+                <div class="divider">OU</div>
+                
+                <h4 class="section-title">Changer le mot de passe</h4>
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="form_type" value="password">
+                    {{ password_form.as_p }}
+                    <div class="password-strength mt-2"><div class="password-strength-bar" id="password-strength-bar"></div></div>
+                    <button type="submit" class="btn btn-warning"><i class="fas fa-key me-2"></i>Changer le mot de passe</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+        <div class="container"><p class="mb-0">&copy; 2025 AutoLocation - Tous droits réservés</p></div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordField = document.getElementById("{{ password_form.new_password1.id_for_label }}");
+            if (passwordField) {
+                passwordField.addEventListener('input', function() {
+                    const password = this.value;
+                    const bar = document.getElementById('password-strength-bar');
+                    let strength = 0;
+                    if (password.length >= 8) strength += 20;
+                    if (/[a-z]/.test(password)) strength += 20;
+                    if (/[A-Z]/.test(password)) strength += 20;
+                    if (/[0-9]/.test(password)) strength += 20;
+                    if (/[^A-Za-z0-9]/.test(password)) strength += 20;
+                    bar.style.width = strength + '%';
+                    bar.style.backgroundColor = strength < 40 ? '#dc3545' : strength < 80 ? '#ffc107' : '#198754';
+                });
+            }
+        });
+    </script>
+</body>
+</html>

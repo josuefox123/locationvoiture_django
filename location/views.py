@@ -20,6 +20,8 @@ import random
 from django.conf import settings
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Count
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
 
 
 
@@ -257,6 +259,69 @@ def modifier_client(request, id):
         form.save()
         return redirect("clients")
     return render(request, "location/formulaire.html", {"form": form})
+
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import PasswordChangeForm
+from django.contrib.auth import update_session_auth_hash
+from django.contrib import messages
+from .models import Client
+from .forms import ClientForm
+
+
+@login_required
+def modifier_mon_profil(request):
+    client = get_object_or_404(Client, user=request.user)
+
+    # Formulaire profil (on exclut les champs sensibles manuellement)
+    form = ClientForm(request.POST or None, instance=client)
+    for field in ["email_confirmed", "confirmation_code", "confirmation_code_expires_at"]:
+        if field in form.fields:
+            form.fields.pop(field)
+
+    # Formulaire mot de passe
+    password_form = PasswordChangeForm(user=request.user, data=request.POST or None)
+
+    if request.method == "POST":
+        form_type = request.POST.get("form_type")
+
+        # Formulaire de profil
+        if form_type == "profile":
+            if form.is_valid():
+                client = form.save(commit=False)
+
+                # Mise à jour aussi du User lié (prénom, nom, email)
+                request.user.first_name = client.prenom
+                request.user.last_name = client.nom
+                request.user.email = client.email
+                request.user.save()
+
+                client.save()
+                messages.success(request, "Profil mis à jour avec succès ✅")
+                return redirect("modifier_mon_profil")
+            else:
+                messages.error(request, "Veuillez corriger les erreurs dans le formulaire.")
+
+        # Formulaire de mot de passe
+        elif form_type == "password":
+            if password_form.is_valid():
+                user = password_form.save()
+                update_session_auth_hash(request, user)  # évite la déconnexion
+                messages.success(request, "Mot de passe modifié avec succès 🔑")
+                return redirect("modifier_mon_profil")
+            else:
+                messages.error(request, "Veuillez corriger les erreurs dans le formulaire de mot de passe.")
+
+    return render(
+        request,
+        "location/modifier_mon_profil.html",
+        {"form": form, "password_form": password_form},
+    )
+
+
+
 
 def supprimer_client(request, id):
     client = get_object_or_404(Client, id_client=id) 
