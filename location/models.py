@@ -4,6 +4,7 @@ import os
 from uuid import uuid4
 from django.utils import timezone
 from django.urls import reverse
+from django.utils.timezone import now
 
 
 # Vehicule Model
@@ -69,3 +70,17 @@ class Louer(models.Model):
         return f"{self.id_client} loue {self.id_vehicule} [{self.get_statut_display()}]"
     
   
+
+# # Message Model
+# class Message(models.Model):
+#     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sent_messages")
+#     receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="received_messages")
+#     content = models.TextField()
+#     timestamp = models.DateTimeField(default=now)
+#     is_read = models.BooleanField(default=False)
+
+#     class Meta:
+#         ordering = ["-timestamp"]
+
+#     def __str__(self):
+#         return f"De {self.sender} à {self.receiver}: {self.content[:30]}"

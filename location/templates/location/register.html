@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,100 +8,232 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+        }
+
         body {
-            background-color: #f8f9fa;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
         }
 
         .register-container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 30px;
+            max-width: 650px;
+            margin: 0 auto;
             background-color: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            animation: fadeIn 0.6s ease-out;
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        .logo {
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo-section {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2.5rem 2rem;
             text-align: center;
-            margin-bottom: 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .logo-section::after {
+            content: '';
+            position: absolute;
+            bottom: -50%;
+            left: -10%;
+            width: 120%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 10"><path d="M0,5 Q25,0 50,5 T100,5 L100,10 L0,10 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-repeat: repeat-x;
+            animation: wave 15s linear infinite;
+        }
+
+        @keyframes wave {
+            from { background-position: 0 0; }
+            to { background-position: -100px 0; }
+        }
+
+        .logo-section h2 {
+            font-weight: 600;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .logo-section p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+
+        .form-section {
+            padding: 2.5rem 2rem;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.25rem rgba(67, 97, 238, 0.15);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            padding: 0.75rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #6c757d;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .alert {
+            border-radius: 8px;
+            padding: 0.75rem 1.25rem;
+        }
+
+        .login-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .login-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .register-container {
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+            }
         }
     </style>
 </head>
-
 <body>
     <div class="container">
         <div class="register-container">
-            <div class="logo">
-                <h2><i class="fa fa-car me-2 text-primary"></i>AutoLocation</h2>
-                <p class="text-muted">Créez votre compte client</p>
+            <div class="logo-section">
+                <h2><i class="fas fa-car-side me-2"></i>AutoLocation</h2>
+                <p>Créez votre compte en quelques secondes</p>
             </div>
+            <div class="form-section">
+                <!-- Messages Django -->
+                {% if messages %}
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %} me-2"></i>
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                </div>
+                {% endfor %}
+                {% endif %}
 
-            <!-- Messages Django -->
-            {% if messages %}
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                <i class="fas fa-{% if message.tags == 'success' %}check-circle{% else %}exclamation-circle{% endif %} me-2"></i>
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-            </div>
-            {% endfor %}
-            {% endif %}
-
-            <!-- Formulaire -->
-            <form method="POST" novalidate>
-                {% csrf_token %}
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="firstName" class="form-label">Prénom</label>
-                        <input type="text" class="form-control" id="firstName" name="prenom" required>
+                <!-- Formulaire -->
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="firstName" class="form-label">Prénom</label>
+                            <input type="text" class="form-control" id="firstName" name="prenom" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="lastName" class="form-label">Nom</label>
+                            <input type="text" class="form-control" id="lastName" name="nom" required>
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="lastName" class="form-label">Nom</label>
-                        <input type="text" class="form-control" id="lastName" name="nom" required>
+
+                    <div class="mb-3 mt-3">
+                        <label for="email" class="form-label">Adresse Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="exemple@email.com" required>
                     </div>
-                </div>
 
-                <div class="mb-3">
-                    <label for="email" class="form-label">Adresse Email</label>
-                    <input type="email" class="form-control" id="email" name="email" placeholder="exemple@email.com" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="telephone" class="form-label">Téléphone</label>
-                    <input type="tel" class="form-control" id="telephone" name="telephone" placeholder="+229 60 00 00 00" required>
-                </div>
-
-                <div class="mb-3">
-                    <label for="profession" class="form-label">Profession</label>
-                    <input type="text" class="form-control" id="profession" name="profession">
-                </div>
-
-                <div class="mb-3">
-                    <label for="address" class="form-label">Adresse</label>
-                    <textarea class="form-control" id="address" name="address" rows="2"></textarea>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label for="password1" class="form-label">Mot de passe</label>
-                        <input type="password" class="form-control" id="password1" name="password1" required minlength="6">
+                    <div class="mb-3">
+                        <label for="telephone" class="form-label">Téléphone</label>
+                        <div class="input-group">
+                            <span class="input-group-text">+229</span>
+                            <input type="tel" class="form-control" id="telephone" name="telephone" placeholder="60 00 00 00" required>
+                        </div>
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="password2" class="form-label">Confirmer le mot de passe</label>
-                        <input type="password" class="form-control" id="password2" name="password2" required minlength="6">
+
+                    <div class="mb-3">
+                        <label for="profession" class="form-label">Profession</label>
+                        <input type="text" class="form-control" id="profession" name="profession" placeholder="Ex: Enseignant, Commerçant">
                     </div>
+
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Adresse</label>
+                        <textarea class="form-control" id="address" name="address" rows="2" placeholder="Ex: 01 BP 1234 Cotonou"></textarea>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="password1" class="form-label">Mot de passe</label>
+                            <div class="password-container">
+                                <input type="password" class="form-control" id="password1" name="password1" required minlength="6" placeholder="6 caractères minimum">
+                                <i class="fas fa-eye password-toggle" id="togglePassword1"></i>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="password2" class="form-label">Confirmer le mot de passe</label>
+                            <div class="password-container">
+                                <input type="password" class="form-control" id="password2" name="password2" required minlength="6">
+                                <i class="fas fa-eye password-toggle" id="togglePassword2"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Créer mon compte
+                        </button>
+                    </div>
+                </form>
+
+                <div class="text-center mt-4 pt-2 border-top">
+                    <p class="mb-0">Déjà un compte ? <a href="{% url 'login' %}" class="login-link">Se connecter</a></p>
                 </div>
-
-                <button type="submit" class="btn btn-primary w-100 btn-lg">
-                    <i class="fas fa-user-plus me-2"></i>
-                    Créer mon compte
-                </button>
-            </form>
-
-            <div class="text-center mt-3">
-                <p>Déjà inscrit ? <a href="{% url 'login' %}">Se connecter</a></p>
             </div>
         </div>
     </div>
@@ -114,14 +245,44 @@
         document.querySelector("form").addEventListener("submit", function (e) {
             const pass1 = document.getElementById("password1").value;
             const pass2 = document.getElementById("password2").value;
-
             if (pass1 !== pass2) {
                 e.preventDefault();
                 alert("Les mots de passe ne correspondent pas !");
                 document.getElementById("password2").focus();
             }
         });
+
+        // Toggle mot de passe
+        const togglePassword1 = document.getElementById('togglePassword1');
+        const togglePassword2 = document.getElementById('togglePassword2');
+        const password1 = document.getElementById('password1');
+        const password2 = document.getElementById('password2');
+
+        togglePassword1.addEventListener('click', function() {
+            const type = password1.getAttribute('type') === 'password' ? 'text' : 'password';
+            password1.setAttribute('type', type);
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        togglePassword2.addEventListener('click', function() {
+            const type = password2.getAttribute('type') === 'password' ? 'text' : 'password';
+            password2.setAttribute('type', type);
+            this.classList.toggle('fa-eye-slash');
+        });
+
+        // Animation des inputs
+        const inputs = document.querySelectorAll('.form-control');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.style.borderColor = '#4361ee';
+                this.style.boxShadow = '0 0 0 0.25rem rgba(67, 97, 238, 0.15)';
+            });
+
+            input.addEventListener('blur', function() {
+                this.style.borderColor = '#e0e0e0';
+                this.style.boxShadow = 'none';
+            });
+        });
     </script>
 </body>
-
 </html>

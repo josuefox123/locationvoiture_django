@@ -43,5 +43,11 @@ path("monadmin/vehicules/", views.monadmin_vehicules, name="monadmin_vehicules")
 path("monadmin/clients/", views.monadmin_clients, name="monadmin_clients"),
 path("monadmin/locations/", views.monadmin_locations, name="monadmin_locations"),
 
+# # Messages
+# # pour tout le monde
+# path("messages/", views.messages_view, name="messages_view"),
+# path("messages/<int:user_id>/", views.messages_view, name="messages_view"),
+
+
 
 ]

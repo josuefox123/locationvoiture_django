@@ -317,16 +317,14 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.url_name == 'monadmin_vehicules' %}active{% endif %}" 
-                       href="{% url 'monadmin_vehicules' %}">
-                        <i class="fas fa-car"></i>
-                        <span>Véhicules</span>
-                        <span class="nav-badge">{% block vehicules_count %}{% endblock %}</span>
-                    <div id="spa-content">
-    {% block content %}{% endblock %}
-</div>
-                    </a>
-                </li>
+    <a class="nav-link {% if request.resolver_match.url_name == 'monadmin_vehicules' %}active{% endif %}" 
+       href="{% url 'monadmin_vehicules' %}">
+        <i class="fas fa-car"></i>
+        <span>Véhicules</span>
+        <span class="nav-badge">{% block vehicules_count %}{% endblock %}</span>
+    </a>
+</li>
+
                 <li class="nav-item">
                     <a class="nav-link {% if request.resolver_match.url_name == 'monadmin_clients' %}active{% endif %}" 
                        href="{% url 'monadmin_clients' %}">

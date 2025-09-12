@@ -24,6 +24,7 @@ from django.db.models import Count
 
 
 
+
 # ===========================
 # ACCUEIL
 # ===========================
@@ -641,5 +642,54 @@ def changer_statut_location(request, id):
 
 
 
+# ===========================
+# MESSAGERIE INTERNE
 
-# Pour le tableau de bord admin
+
+# @login_required
+# def messages_view(request, user_id=None):
+#     users = User.objects.exclude(id=request.user.id)
+
+#     # Si admin → il voit tous les utilisateurs
+#     if request.user.is_staff:
+#         users = User.objects.exclude(id=request.user.id)
+#     else:
+#         # Si client → il voit seulement l’admin
+#         users = User.objects.filter(is_staff=True)
+
+#     selected_user = None
+#     conversation = []
+
+#     if user_id:
+#         selected_user = User.objects.get(id=user_id)
+#         conversation = Message.objects.filter(
+#             sender__in=[request.user, selected_user],
+#             receiver__in=[request.user, selected_user]
+#         ).order_by("timestamp")
+
+#         # marquer comme lus
+#         Message.objects.filter(receiver=request.user, sender=selected_user).update(is_read=True)
+
+#     if request.method == "POST":
+#         content = request.POST.get("message")
+#         if content and selected_user:
+#             Message.objects.create(sender=request.user, receiver=selected_user, content=content)
+#             return redirect("messages_view", user_id=selected_user.id)
+
+#     return render(request, "location/messaging.html", {
+#         "users": users,
+#         "selected_user": selected_user,
+#         "conversation": conversation,
+#     })
+
+# def chatbot_response(message):
+#     message = message.lower()
+#     if "prix" in message:
+#         return "Nos prix dépendent du véhicule choisi, consultez la page Véhicules."
+#     elif "disponible" in message:
+#         return "Les véhicules disponibles sont affichés sur la page d'accueil."
+#     elif "bonjour" in message:
+#         return "Bonjour 👋, comment puis-je vous aider ?"
+#     else:
+#         return "Merci pour votre message, un administrateur va vous répondre."
+
